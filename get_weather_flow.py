@@ -69,27 +69,29 @@ def weather_and_pollution_flow():
 
         # Fetch current weather data
         weather_data = get_weather_data(lat, lon)
+        print(weather_data)
         # Add city name for clarity
-        kafka_event["dt"] = weather_data[0]["dt"]
-        kafka_event["temp"] = weather_data[0]["main"]["temp"]
-        kafka_event["pressure"] = weather_data[0]["main"]["pressure"]
-        kafka_event["humidity"] = weather_data[0]["main"]["humidity"]
-        kafka_event["clouds_all"] = weather_data[0]["clouds"]["all"]
+        kafka_event["dt"] = weather_data["dt"]
+        kafka_event["temp"] = weather_data["main"]["temp"]
+        kafka_event["pressure"] = weather_data["main"]["pressure"]
+        kafka_event["humidity"] = weather_data["main"]["humidity"]
+        kafka_event["clouds_all"] = weather_data["clouds"]["all"]
         kafka_event["weather_main"] = weather_data[0]["weather"]["main"]
         kafka_event["weather_description"] = weather_data[0]["weather"]["description"]
 
         # Fetch current air pollution data
         air_pollution_data = get_air_pollution_data(lat, lon)
+        print(air_pollution_data)
         # Add city name for clarity
-        kafka_event["pol_aqi"] = air_pollution_data[0]["main"]["aqi"]
-        kafka_event["pol_co"] = air_pollution_data[0]["components"]["co"]
-        kafka_event["pol_no"] = air_pollution_data[0]["components"]["no"]
-        kafka_event["pol_no2"] = air_pollution_data[0]["components"]["no2"]
-        kafka_event["pol_o3"] = air_pollution_data[0]["components"]["o3"]
-        kafka_event["pol_so2"] = air_pollution_data[0]["components"]["so2"]
-        kafka_event["pol_pm2_5"] = air_pollution_data[0]["components"]["pm2_5"]
-        kafka_event["pol_pm10"] = air_pollution_data[0]["components"]["pm10"]
-        kafka_event["pol_nh3"] = air_pollution_data[0]["components"]["nh3"]
+        kafka_event["pol_aqi"] = air_pollution_data["list"][0]["main"]["aqi"]
+        kafka_event["pol_co"] = air_pollution_data["list"][0]["components"]["co"]
+        kafka_event["pol_no"] = air_pollution_data["list"][0]["components"]["no"]
+        kafka_event["pol_no2"] = air_pollution_data["list"][0]["components"]["no2"]
+        kafka_event["pol_o3"] = air_pollution_data["list"][0]["components"]["o3"]
+        kafka_event["pol_so2"] = air_pollution_data["list"][0]["components"]["so2"]
+        kafka_event["pol_pm2_5"] = air_pollution_data["list"][0]["components"]["pm2_5"]
+        kafka_event["pol_pm10"] = air_pollution_data["list"][0]["components"]["pm10"]
+        kafka_event["pol_nh3"] = air_pollution_data["list"][0]["components"]["nh3"]
 
         # Send data to Kafka topics asynchronously
         send_to_kafka.submit(KAFKA_TOPIC, kafka_event)
