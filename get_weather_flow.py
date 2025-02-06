@@ -3,6 +3,7 @@ import requests
 from kafka import KafkaProducer
 from prefect import flow, task
 from prefect.variables import Variable
+from prefect.logging import get_run_logger
 
 
 # --- Configuration ---
@@ -61,6 +62,7 @@ def weather_and_pollution_flow():
     Main Prefect flow that fetches weather and air pollution data for each city
     and sends it to Kafka.
     """
+    logger = get_run_logger()
     for city, coords in cities.items():
         lat = coords["lat"]
         lon = coords["lon"]
@@ -69,19 +71,21 @@ def weather_and_pollution_flow():
 
         # Fetch current weather data
         weather_data = get_weather_data(lat, lon)
-        print(weather_data)
+        logger.debug("weather for %s", city)
+        logger.debug(weather_data)
         # Add city name for clarity
         kafka_event["dt"] = weather_data["dt"]
         kafka_event["temp"] = weather_data["main"]["temp"]
         kafka_event["pressure"] = weather_data["main"]["pressure"]
         kafka_event["humidity"] = weather_data["main"]["humidity"]
         kafka_event["clouds_all"] = weather_data["clouds"]["all"]
-        kafka_event["weather_main"] = weather_data[0]["weather"]["main"]
-        kafka_event["weather_description"] = weather_data[0]["weather"]["description"]
+        kafka_event["weather_main"] = weather_data["weather"][0]["main"]
+        kafka_event["weather_description"] = weather_data["weather"][0]["description"]
 
         # Fetch current air pollution data
         air_pollution_data = get_air_pollution_data(lat, lon)
-        print(air_pollution_data)
+        logger.debug("air pollution for %s", city)
+        logger.debug(air_pollution_data)
         # Add city name for clarity
         kafka_event["pol_aqi"] = air_pollution_data["list"][0]["main"]["aqi"]
         kafka_event["pol_co"] = air_pollution_data["list"][0]["components"]["co"]
