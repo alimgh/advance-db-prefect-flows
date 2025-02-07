@@ -4,20 +4,16 @@ from kafka import KafkaProducer
 from prefect import flow, task
 from prefect.variables import Variable
 from prefect.logging import get_run_logger
+from prefect import settings
+
+
+settings.PREFECT_LOGGING_LEVEL = "DEBUG"
 
 
 # --- Configuration ---
-API_KEY = Variable.get("openweathermap_api_key")  # Provide a default empty value
-KAFKA_BOOTSTRAP_SERVERS = ['kafka:9092']  # Update with your Kafka broker addresses
+API_KEY = Variable.get("openweathermap_api_key")
+KAFKA_BOOTSTRAP_SERVERS = ['kafka:9092']
 KAFKA_TOPIC = "openweather"
-
-# City coordinates for Tehran, Mashhad, Qom, and Isfahan
-cities = {
-    "Tehran": {"lat": "35.715298", "lon": "51.404343"},
-    "Mashhad": {"lat": "36.310699", "lon": "59.599457"},
-    "Qom": {"lat": "34.639999", "lon": "50.876389"},
-    "Isfahan": {"lat": "32.661343", "lon": "51.680676"}  # Approximate coordinates
-}
 
 
 @task
@@ -57,7 +53,7 @@ def send_to_kafka(topic: str, data: dict) -> None:
 
 
 @flow
-def weather_and_pollution_flow():
+def weather_and_pollution_flow(cities: dict):
     """
     Main Prefect flow that fetches weather and air pollution data for each city
     and sends it to Kafka.
@@ -101,5 +97,11 @@ def weather_and_pollution_flow():
         send_to_kafka.submit(KAFKA_TOPIC, kafka_event)
 
 
-if __name__ == "__main__":
-    weather_and_pollution_flow()
+if __name__ == "__main__":# Default cities dictionary
+    default_cities = {
+        "Tehran": {"lat": "35.715298", "lon": "51.404343"},
+        "Mashhad": {"lat": "36.310699", "lon": "59.599457"},
+        "Qom": {"lat": "34.639999", "lon": "50.876389"},
+        "Isfahan": {"lat": "32.661343", "lon": "51.680676"}  # Approximate coordinates
+    }
+    weather_and_pollution_flow(cities=default_cities)
