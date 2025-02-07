@@ -6,8 +6,9 @@ deployments:
   entrypoint: get_weather_flow.py:weather_and_pollution_flow
   work_pool:
     name: my-work-pool
+    job_variables:
+      image: python:3.12
     work_queue_name:
-    job_variables: {}
   version:
   tags: []
   concurrency_limit:
