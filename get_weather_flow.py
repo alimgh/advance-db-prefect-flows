@@ -152,7 +152,7 @@ def weather_and_pollution_flow_v2(cities: list[str]):
         start_time = time.time()
 
         kafka_event = {"city_en": city_en, "city_fa": city_fa, "cell": cell}
-        lat, lon = h3.cell_to_geo(cell)
+        lat, lon = h3.cell_to_latlng(cell)
 
         # Fetch current weather data
         weather_data = get_weather_data(lat, lon)
