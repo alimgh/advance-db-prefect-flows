@@ -30,7 +30,7 @@ def get_city_hexagons(data, cities):
     city_hexagons = dict()
     for city in data["features"]:
         city_name_fa, city_name_en = city["properties"]["ADM2_FA"], city["properties"]["ADM2_EN"]
-        if city_name_en not in cities:
+        if cities and city_name_en not in cities:
             continue
 
         if len(city["geometry"]["coordinates"]) == 1:
@@ -139,13 +139,14 @@ def weather_and_pollution_flow(cities: dict):
 
 
 @flow
-def weather_and_pollution_flow_v2(cities: list[str]):
+def weather_and_pollution_flow_v2(cities: list[str], sleep_time: int):
     """
     Main Prefect flow that fetches weather and air pollution data for each distributed points
     in cities and sends it to Kafka.
     """
     logger = get_run_logger()
     cities_data = get_data()
+    cities = None if "*" in cities else cities
     cities_hexagons = get_city_hexagons(cities_data, cities)
     logger.debug("fetching data for %d cities", len(cities_hexagons))
     flatten_city_hexagons = flat(cities_hexagons)
@@ -187,7 +188,7 @@ def weather_and_pollution_flow_v2(cities: list[str]):
         logger.debug("sending to kafka for (%s, %s, %s)", city_en, city_fa, cell)
         send_to_kafka.submit(KAFKA_TOPIC_V2, kafka_event)
 
-        while time.time() - start_time < 1:
+        while time.time() - start_time < sleep_time:
             pass
 
 
@@ -218,4 +219,4 @@ if __name__ == "__main__":  # Default cities
         "Arak",
         "Sari",
     ]
-    weather_and_pollution_flow_v2(cities=default_cities)
+    weather_and_pollution_flow_v2(cities=default_cities, sleep_time=1)
