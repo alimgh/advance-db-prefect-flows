@@ -6,26 +6,25 @@ deployments:
   entrypoint: get_weather_flow.py:weather_and_pollution_flow
   work_pool:
     name: my-work-pool
-#    job_variables:
-#      image: python:3.12
     work_queue_name:
+    job_variables: {}
   version:
   tags: []
   concurrency_limit:
   parameters:
     cities:
       Tehran:
-        lat: "35.715298"
-        lon: "51.404343"
+        lat: '35.715298'
+        lon: '51.404343'
       Mashhad:
-        lat: "36.310699"
-        lon: "59.599457"
+        lat: '36.310699'
+        lon: '59.599457'
       Qom:
-        lat: "34.639999"
-        lon: "50.876389"
+        lat: '34.639999'
+        lon: '50.876389'
       Isfahan:
-        lat: "32.661343"
-        lon: "51.680676"
+        lat: '32.661343'
+        lon: '51.680676'
   schedules:
   - cron: 0 * * * *
     timezone: UTC
@@ -38,4 +37,4 @@ pull:
     branch: main
 - prefect.deployments.steps.pip_install_requirements:
     requirements_file: requirements.txt
-    directory: "{{ clone-step.directory }}"
+    directory: '{{ clone-step.directory }}'
