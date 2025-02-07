@@ -88,6 +88,7 @@ def flat(cities_hexagons):
     for city, hexagons in cities_hexagons.items():
         for hexagon in hexagons:
             result.append((*city, hexagon))
+    return result
 
 
 @flow
