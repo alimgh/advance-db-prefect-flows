@@ -148,7 +148,7 @@ def weather_and_pollution_flow_v2(cities: list[str], sleep_time: int):
     cities_data = get_data()
     cities = None if "*" in cities else cities
     cities_hexagons = get_city_hexagons(cities_data, cities)
-    logger.debug("fetching data for %d cities", len(cities_hexagons))
+    logger.info("fetching data for %d cities", len(cities_hexagons))
     flatten_city_hexagons = flat(cities_hexagons)
     for city_en, city_fa, cell in flatten_city_hexagons:
         start_time = time.time()
@@ -158,8 +158,6 @@ def weather_and_pollution_flow_v2(cities: list[str], sleep_time: int):
 
         # Fetch current weather data
         weather_data = get_weather_data(lat, lon)
-        logger.debug("weather for (%s, %s, %s)", city_en, city_fa, cell)
-        logger.debug(weather_data)
         # Add city name for clarity
         kafka_event["dt"] = weather_data["dt"]
         kafka_event["temp"] = weather_data["main"]["temp"]
@@ -171,8 +169,6 @@ def weather_and_pollution_flow_v2(cities: list[str], sleep_time: int):
 
         # Fetch current air pollution data
         air_pollution_data = get_air_pollution_data(lat, lon)
-        logger.debug("air pollution for (%s, %s, %s)", city_en, city_fa, cell)
-        logger.debug(air_pollution_data)
         # Add city name for clarity
         kafka_event["pol_aqi"] = air_pollution_data["list"][0]["main"]["aqi"]
         kafka_event["pol_co"] = air_pollution_data["list"][0]["components"]["co"]
@@ -185,7 +181,6 @@ def weather_and_pollution_flow_v2(cities: list[str], sleep_time: int):
         kafka_event["pol_nh3"] = air_pollution_data["list"][0]["components"]["nh3"]
 
         # Send data to Kafka topics asynchronously
-        logger.debug("sending to kafka for (%s, %s, %s)", city_en, city_fa, cell)
         send_to_kafka.submit(KAFKA_TOPIC_V2, kafka_event)
 
         while time.time() - start_time < sleep_time:
