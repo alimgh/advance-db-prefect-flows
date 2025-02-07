@@ -1,3 +1,4 @@
+h3==4.2.1
 kafka-python
 requests~=2.32.3
 prefect

@@ -1,41 +1,80 @@
 deployments:
   # base metadata
-- name: openweathermap-flow-deployment
-  description: "Deployment for the weather flow that fetches current weather and air
-    pollution data for Tehran, Mashhad, Qom, and Isfahan and sends it to Kafka.\n"
-  entrypoint: get_weather_flow.py:weather_and_pollution_flow
-  work_pool:
-    name: my-work-pool
-    job_variables:
-      image: python:3.12
-    work_queue_name:
-  version:
-  tags: []
-  concurrency_limit:
-  parameters:
-    cities:
-      Tehran:
-        lat: '35.715298'
-        lon: '51.404343'
-      Mashhad:
-        lat: '36.310699'
-        lon: '59.599457'
-      Qom:
-        lat: '34.639999'
-        lon: '50.876389'
-      Isfahan:
-        lat: '32.661343'
-        lon: '51.680676'
-  schedules:
-  - cron: 0 * * * *
-    timezone: UTC
-    day_or: true
-    active: true
+  - name: openweathermap-flow-deployment
+    description:
+      "Deployment for the weather flow that fetches current weather and air
+      pollution data for Tehran, Mashhad, Qom, and Isfahan and sends it to Kafka.\n"
+    entrypoint: get_weather_flow.py:weather_and_pollution_flow
+    work_pool:
+      name: my-work-pool
+      job_variables:
+        image: python:3.12
+      work_queue_name:
+    version:
+    tags: []
+    concurrency_limit:
+    parameters:
+      cities:
+        Tehran:
+          lat: "35.715298"
+          lon: "51.404343"
+        Mashhad:
+          lat: "36.310699"
+          lon: "59.599457"
+        Qom:
+          lat: "34.639999"
+          lon: "50.876389"
+        Isfahan:
+          lat: "32.661343"
+          lon: "51.680676"
+    schedules:
+      - cron: 0 * * * *
+        timezone: UTC
+        day_or: true
+        active: true
+
+  - name: openweathermap-flow-deployment_v2
+    description:
+      "Deployment for the weather flow that fetches current weather and air
+      pollution data for distributed points in big cities of Iran and sends it to Kafka.\n"
+    entrypoint: get_weather_flow.py:weather_and_pollution_flow_v2
+    work_pool:
+      name: my-work-pool
+      job_variables:
+        image: python:3.12
+      work_queue_name:
+    version:
+    tags: []
+    concurrency_limit:
+    parameters:
+      cities:
+        - Tehran
+        - Qom
+        - Mashhad
+        - Isfahan
+        - Shiraz
+        - Ahvaz
+        - Karaj
+        - Tabriz
+        - Kermanshah
+        - Urumia
+        - Rasht
+        - Yazd
+        - Bandar-Abbas
+        - Hamadan
+        - Arak
+        - Sari
+    schedules:
+      - cron: 0 * * * *
+        timezone: UTC
+        day_or: true
+        active: true
+
 pull:
-- prefect.deployments.steps.git_clone:
-    id: clone-step
-    repository: https://github.com/alimgh/advance-db-prefect-flows.git
-    branch: main
-- prefect.deployments.steps.pip_install_requirements:
-    requirements_file: requirements.txt
-    directory: '{{ clone-step.directory }}'
+  - prefect.deployments.steps.git_clone:
+      id: clone-step
+      repository: https://github.com/alimgh/advance-db-prefect-flows.git
+      branch: main
+  - prefect.deployments.steps.pip_install_requirements:
+      requirements_file: requirements.txt
+      directory: "{{ clone-step.directory }}"
