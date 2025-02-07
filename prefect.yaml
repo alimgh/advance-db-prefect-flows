@@ -81,7 +81,7 @@ deployments:
         - Yasooj
         - Ilam
     schedules:
-      - cron: "*/10 * * * *"
+      - cron: "*/20 * * * *"
         timezone: UTC
         day_or: true
         active: true
