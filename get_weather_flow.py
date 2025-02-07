@@ -12,6 +12,7 @@ from prefect.logging import get_run_logger
 API_KEY = Variable.get("openweathermap_api_key")
 KAFKA_BOOTSTRAP_SERVERS = ["kafka:9092"]
 KAFKA_TOPIC = "openweather"
+KAFKA_TOPIC_V2 = "openweather_v2"
 
 
 def get_data():
@@ -184,7 +185,7 @@ def weather_and_pollution_flow_v2(cities: list[str]):
 
         # Send data to Kafka topics asynchronously
         logger.debug("sending to kafka for (%s, %s, %s)", city_en, city_fa, cell)
-        send_to_kafka.submit(KAFKA_TOPIC, kafka_event)
+        send_to_kafka.submit(KAFKA_TOPIC_V2, kafka_event)
 
         while time.time() - start_time < 1:
             pass
