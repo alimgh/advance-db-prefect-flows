@@ -63,8 +63,8 @@ def weather_and_pollution_flow(cities: dict):
 
         # Fetch current weather data
         weather_data = get_weather_data(lat, lon)
-        logger.info("weather for %s", city)
-        logger.info(weather_data)
+        logger.debug("weather for %s", city)
+        logger.debug(weather_data)
         # Add city name for clarity
         kafka_event["dt"] = weather_data["dt"]
         kafka_event["temp"] = weather_data["main"]["temp"]
@@ -76,8 +76,8 @@ def weather_and_pollution_flow(cities: dict):
 
         # Fetch current air pollution data
         air_pollution_data = get_air_pollution_data(lat, lon)
-        logger.info("air pollution for %s", city)
-        logger.info(air_pollution_data)
+        logger.debug("air pollution for %s", city)
+        logger.debug(air_pollution_data)
         # Add city name for clarity
         kafka_event["pol_aqi"] = air_pollution_data["list"][0]["main"]["aqi"]
         kafka_event["pol_co"] = air_pollution_data["list"][0]["components"]["co"]
@@ -90,7 +90,7 @@ def weather_and_pollution_flow(cities: dict):
         kafka_event["pol_nh3"] = air_pollution_data["list"][0]["components"]["nh3"]
 
         # Send data to Kafka topics asynchronously
-        logger.info("sending to kafka for %s", city)
+        logger.debug("sending to kafka for %s", city)
         send_to_kafka.submit(KAFKA_TOPIC, kafka_event)
 
 
